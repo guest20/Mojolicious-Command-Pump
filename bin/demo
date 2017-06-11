@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+use lib qw[ ./lib ];
+use Mojolicious::Command::pump;
+
+# Documentation browser under "/perldoc"
+plugin PODRenderer => {no_perldoc => 1};
+
+
+get '/' => sub {
+  my $c = shift;
+  $c->render(template => 'index');
+};
+
+any '/perldoc/:module' =>
+        {module => 'Mojolicious::Command::Pump', format => 'html'},
+        [module => qr/[^.]+/] =>
+        \&Mojolicious::Plugin::PODRenderer::_perldoc;
+
+app->start;
+__DATA__
+
+It's ok to have stuff after DATA but before an @@ line.
+
+@@ index.html.ep
+% layout 'default';
+% title 'Welcome';
+
+<h1>Welcome to the Mojolicious real-time web framework!</h1>
+To learn more, you can browse through the documentation
+<%= link_to 'here' => '/perldoc' %>.
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
+</html>
